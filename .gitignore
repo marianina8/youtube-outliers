@@ -1,0 +1,12 @@
+# compiled binary
+/youtube-outliers
+
+# generated run outputs (CSV exports + one-off analysis writeups) - regenerate with the CLI
+*.csv
+content-strategy-outliers.md
+
+# OS cruft
+.DS_Store
+
+# Cowork desktop app scratch folder, not part of the project
+Claude outputs/

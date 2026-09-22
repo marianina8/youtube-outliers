@@ -1,0 +1,88 @@
+# Core Go + AI
+golang ai
+go ai
+golang llm
+go llm
+golang ai agent
+go ai agent
+golang agents
+go agents
+golang generative ai
+go generative ai
+golang rag
+go rag
+
+# MCP + Go
+golang mcp
+go mcp
+golang mcp server
+go mcp server
+mcp server golang
+mcp server go
+build mcp server golang
+build mcp server go
+golang model context protocol
+go model context protocol
+golang mcp client
+go mcp client
+mcp cli
+golang cli mcp
+go cli mcp
+
+# MCP broader market
+mcp server
+build mcp server
+mcp server tutorial
+mcp tutorial
+model context protocol
+model context protocol tutorial
+mcp tools
+mcp client
+mcp github
+github mcp server
+claude mcp
+claude mcp server
+claude code mcp
+mcp agent
+mcp ai agent
+
+# AI engineering / developer workflow
+ai agents
+ai agent tutorial
+build ai agent
+ai agent tools
+ai coding workflow
+ai developer tools
+agentic coding
+claude code
+claude code tutorial
+claude code workflow
+coding agents
+llm tools
+llm tool calling
+function calling llm
+ai tool calling
+
+# Adjacent ecosystems: look for ideas worth translating to Go
+python mcp
+python mcp server
+python ai agent
+python llm tools
+typescript mcp
+typescript mcp server
+typescript ai agent
+node mcp server
+rust mcp
+rust ai agent
+
+# Practical integrations / hooks
+github ai agent
+github mcp
+mcp postgres
+mcp database
+mcp slack
+mcp api
+mcp command line
+cli ai agent
+ai agent command line
+claude cli tools
