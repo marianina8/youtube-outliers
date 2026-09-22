@@ -16,11 +16,11 @@ cd youtube-outliers
 
 The intended workflow is:
 
-1. Search a broad list of Go/AI/MCP and adjacent keywords.
+1. Search a broad list of keywords in your niche, plus adjacent/bigger topics whose ideas you might adapt (see "Build Your Own Keyword List" below).
 2. Pull video views and channel subscriber counts from the YouTube Data API.
 3. Calculate `views / subscribers` and `views / day`.
 4. Export a CSV.
-5. Give the CSV to Claude or ChatGPT to identify patterns, hooks, and Go-specific opportunities.
+5. Give the CSV to Claude or ChatGPT to identify patterns, hooks, and opportunities for your channel.
 
 ## 1. Create a YouTube Data API key
 
@@ -63,6 +63,54 @@ on a default Google Cloud project) before spending it. Channel subscriber
 lookups are cached for the life of a run, so a channel that turns up under
 many different keywords is only looked up once. Press Ctrl+C at any time to
 stop early; the CLI still writes out whatever it collected so far.
+
+## Build Your Own Keyword List
+
+The included `keywords.txt` is just an example (home espresso) showing the
+pattern — replace it with phrases from your own niche. The CLI treats every
+non-comment, non-blank line as one YouTube search, so `keywords.txt` is a
+plain list, one phrase per line:
+
+```text
+# lines starting with # are ignored
+your core topic here
+another phrasing of it
+```
+
+A good list usually mixes five kinds of phrases:
+
+1. **Core niche terms** — your main topic, phrased a few different ways
+   (e.g. "sourdough baking", "sourdough for beginners").
+2. **How-to / tutorial phrasing** — how people search when they're trying to
+   learn something ("how to X", "X troubleshooting", "X tips", "X explained").
+3. **Tool, brand, or product names** — specific things people in your space
+   search for by name (a piece of gear, software, or a named technique).
+4. **Comparison phrasing** — people deciding between two options
+   ("X vs Y").
+5. **Adjacent / bigger neighboring topics** — larger spaces near your niche
+   whose successful formats or hooks you could adapt. This is the same trick
+   the example list uses ("coffee brewing tips", "third wave coffee" next to
+   the core espresso terms): find what already works next door, then decide
+   if a version in your niche would land.
+
+This pattern isn't tech-specific. A few other starting points:
+
+- **Home fitness:** `beginner home workout`, `how to deadlift`, `resistance band workout`, `peloton vs mirror`, `bodyweight training`
+- **Personal finance:** `budgeting for beginners`, `how to build credit`, `roth ira explained`, `index funds vs etfs`, `personal finance tips`
+- **Woodworking:** `beginner woodworking projects`, `how to use a router`, `table saw safety`, `hand tools vs power tools`, `furniture making`
+
+A couple of practical tips:
+
+- Write phrases the way people actually type them into YouTube search — short
+  and specific, not full sentences.
+- Watch out for short or generic phrases that collide with unrelated
+  content. A two-word phrase can share a name with a mobile game, a brand,
+  or a meme and flood your results with junk — check your first run's output
+  for anything that clearly doesn't belong, and drop or reword that keyword.
+- Mind your quota: every keyword costs at least 100 quota units to search
+  (see "Quota awareness" below), so a list of 20-40 keywords is a reasonable
+  starting size. The CLI prints its estimated cost before it starts so you
+  can check before spending it.
 
 ## 3. Run a first search
 
@@ -152,10 +200,10 @@ YouTube may hide subscriber counts for some channels. Those videos remain availa
 
 After producing `all_results.csv`, attach it to Claude or ChatGPT and use something like:
 
-> Analyze this YouTube dataset for content opportunities for a software engineer creating content around Go, AI, MCP, agents, CLIs, and developer tooling. Look especially for recent videos from smaller channels that dramatically outperform their subscriber count. Identify recurring audience problems, hooks, and formats rather than simply ranking the highest-view videos. Also identify successful Python, TypeScript, Rust, or general-AI ideas that could be translated into an authoritative Go implementation. Give me the 10 strongest opportunities. For each, cite the evidence in the dataset, explain the underlying audience problem, propose a Go-specific video, suggest 3 titles and a thumbnail concept, and explain whether it could naturally funnel into a Go + AI/MCP course.
+> Analyze this YouTube dataset for content opportunities in [your niche — e.g. "home espresso" or "personal finance"]. Look especially for recent videos from smaller channels that dramatically outperform their subscriber count. Identify recurring audience problems, hooks, and formats rather than simply ranking the highest-view videos. Also identify successful ideas from adjacent or larger neighboring topics in the dataset that could be adapted into my niche. Give me the 10 strongest opportunities. For each, cite the evidence in the dataset, explain the underlying audience problem, propose a specific video for my channel, suggest 3 titles and a thumbnail concept, and explain whether it could naturally funnel into a paid course or product.
 
 ## A note about YouTube search
 
 `search.list` is the discovery mechanism. The CLI then batches the resulting video IDs through `videos.list` for video statistics and the channel IDs through `channels.list` for subscriber statistics.
 
-The supplied `keywords.txt` intentionally includes Python, TypeScript, Rust, and broad MCP/AI searches. The goal is not to make videos about all of those ecosystems; it is to discover successful ideas in larger adjacent ecosystems and decide whether a Go version would be compelling.
+The example `keywords.txt` mixes core niche terms with adjacent/bigger neighboring topics on purpose (see "Build Your Own Keyword List" above). The goal isn't to make videos about every topic in the list — it's to discover successful formats and hooks in nearby spaces and decide whether a version in your own niche would be compelling.
