@@ -198,7 +198,12 @@ YouTube may hide subscriber counts for some channels. Those videos remain availa
 
 ## Claude / ChatGPT analysis prompt
 
-After producing `all_results.csv`, attach it to Claude or ChatGPT and use something like:
+For a thorough analysis, use the skill in [`skills/youtube-outlier-analyst/`](skills/youtube-outlier-analyst/):
+
+- **Claude:** copy the `youtube-outlier-analyst` folder into your Claude Skills directory (or a project's `.claude/skills/`), then attach your CSV and ask Claude to use the `youtube-outlier-analyst` skill. It sanity-checks the data for keyword-collision noise and large-channel false positives before ranking, and writes each opportunity with cited evidence rather than an opaque score.
+- **ChatGPT:** paste [`skills/youtube-outlier-analyst/chatgpt-prompt.md`](skills/youtube-outlier-analyst/chatgpt-prompt.md)'s prompt block into a new chat (or a Custom GPT's instructions) before attaching your CSV.
+
+For a quick one-off instead, attach `all_results.csv` to Claude or ChatGPT and use something like:
 
 > Analyze this YouTube dataset for content opportunities in [your niche — e.g. "home espresso" or "personal finance"]. Look especially for recent videos from smaller channels that dramatically outperform their subscriber count. Identify recurring audience problems, hooks, and formats rather than simply ranking the highest-view videos. Also identify successful ideas from adjacent or larger neighboring topics in the dataset that could be adapted into my niche. Give me the 10 strongest opportunities. For each, cite the evidence in the dataset, explain the underlying audience problem, propose a specific video for my channel, suggest 3 titles and a thumbnail concept, and explain whether it could naturally funnel into a paid course or product.
 
