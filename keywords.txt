@@ -1,32 +1,45 @@
 # keywords.txt — one search phrase per line.
 # Blank lines and lines starting with # are ignored.
 #
-# This is an EXAMPLE list (a home-espresso channel) showing the pattern to
-# follow. Replace every line below with phrases from YOUR niche before
-# running the CLI for real — see "Build Your Own Keyword List" in README.md
-# for the method and more example niches.
+# This is a REAL example list (personal finance) showing the pattern to
+# follow — swap it for phrases from YOUR niche before running the CLI for
+# real. See "Build Your Own Keyword List" in README.md for the method and
+# instructions on replacing this file with your own.
 
 # --- Core niche terms: your main topic, phrased a few different ways ---
-home espresso setup
-espresso machine review
-espresso for beginners
+personal finance for beginners
+budgeting for beginners
+how to save money
+emergency fund
+debt payoff plan
+money management tips
 
 # --- How-to / tutorial phrasing: people searching to learn something ---
-how to dial in espresso
-espresso troubleshooting
-espresso tips
+how to build credit
+how to start investing
+how to negotiate salary
+how to file taxes yourself
+how to read a paycheck
+how to make a budget
 
 # --- Tool, brand, or product names: specific things people search by name ---
-breville barista express review
-flair 58 review
-gaggia classic pro
+ynab budgeting app
+mint budgeting app
+robinhood investing app
+fidelity index funds
+chase sapphire preferred
 
 # --- Comparison phrasing: people deciding between two options ---
-espresso machine vs pod machine
-manual vs semi-automatic espresso
+roth ira vs traditional ira
+index funds vs etfs
+credit union vs bank
+debt snowball vs avalanche
+renting vs buying a house
 
 # --- Adjacent / broader ecosystem: bigger neighboring topics whose ideas ---
 # --- or formats you might adapt into your own niche ---
-home barista setup
-coffee brewing tips
-third wave coffee
+frugal living tips
+side hustle ideas
+financial independence retire early
+money mindset
+minimalist lifestyle

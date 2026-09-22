@@ -66,16 +66,24 @@ stop early; the CLI still writes out whatever it collected so far.
 
 ## Build Your Own Keyword List
 
-The included `keywords.txt` is just an example (home espresso) showing the
-pattern — replace it with phrases from your own niche. The CLI treats every
-non-comment, non-blank line as one YouTube search, so `keywords.txt` is a
-plain list, one phrase per line:
+The included `keywords.txt` is a real, working example (personal finance)
+showing the pattern to follow — it's not a placeholder, it's a genuine
+list you could run as-is. Replace it with phrases from your own niche
+before using this for real research.
 
-```text
-# lines starting with # are ignored
-your core topic here
-another phrasing of it
-```
+### How to replace it
+
+1. Open `keywords.txt` in any text editor.
+2. Delete the existing lines (keep or delete the `#` comments — they're
+   ignored either way).
+3. Add your own phrases, one per line. Blank lines and lines starting with
+   `#` are ignored, so you can keep the category comments as a template if
+   you find them useful.
+4. Save the file. There's nothing else to configure — the CLI reads
+   whatever `keywords.txt` (or the file passed to `--keywords`) contains
+   the next time you run it.
+
+### How to build a good list
 
 A good list usually mixes five kinds of phrases:
 
@@ -89,14 +97,14 @@ A good list usually mixes five kinds of phrases:
    ("X vs Y").
 5. **Adjacent / bigger neighboring topics** — larger spaces near your niche
    whose successful formats or hooks you could adapt. This is the same trick
-   the example list uses ("coffee brewing tips", "third wave coffee" next to
-   the core espresso terms): find what already works next door, then decide
-   if a version in your niche would land.
+   the example list uses ("side hustle ideas", "financial independence
+   retire early" next to the core budgeting terms): find what already works
+   next door, then decide if a version in your niche would land.
 
-This pattern isn't tech-specific. A few other starting points:
+This pattern isn't finance-specific. A few other starting points:
 
 - **Home fitness:** `beginner home workout`, `how to deadlift`, `resistance band workout`, `peloton vs mirror`, `bodyweight training`
-- **Personal finance:** `budgeting for beginners`, `how to build credit`, `roth ira explained`, `index funds vs etfs`, `personal finance tips`
+- **Home cooking:** `easy weeknight dinners`, `how to meal prep`, `dutch oven recipes`, `air fryer vs oven`, `sourdough for beginners`
 - **Woodworking:** `beginner woodworking projects`, `how to use a router`, `table saw safety`, `hand tools vs power tools`, `furniture making`
 
 A couple of practical tips:
@@ -205,7 +213,7 @@ For a thorough analysis, use the skill in [`skills/youtube-outlier-analyst/`](sk
 
 For a quick one-off instead, attach `all_results.csv` to Claude or ChatGPT and use something like:
 
-> Analyze this YouTube dataset for content opportunities in [your niche — e.g. "home espresso" or "personal finance"]. Look especially for recent videos from smaller channels that dramatically outperform their subscriber count. Identify recurring audience problems, hooks, and formats rather than simply ranking the highest-view videos. Also identify successful ideas from adjacent or larger neighboring topics in the dataset that could be adapted into my niche. Give me the 10 strongest opportunities. For each, cite the evidence in the dataset, explain the underlying audience problem, propose a specific video for my channel, suggest 3 titles and a thumbnail concept, and explain whether it could naturally funnel into a paid course or product.
+> Analyze this YouTube dataset for content opportunities in [your niche — e.g. "personal finance" or "home fitness"]. Look especially for recent videos from smaller channels that dramatically outperform their subscriber count. Identify recurring audience problems, hooks, and formats rather than simply ranking the highest-view videos. Also identify successful ideas from adjacent or larger neighboring topics in the dataset that could be adapted into my niche. Give me the 10 strongest opportunities. For each, cite the evidence in the dataset, explain the underlying audience problem, propose a specific video for my channel, suggest 3 titles and a thumbnail concept, and explain whether it could naturally funnel into a paid course or product.
 
 ## A note about YouTube search
 
