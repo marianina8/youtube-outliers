@@ -1,5 +1,6 @@
-# compiled binary
+# compiled binaries
 /youtube-outliers
+/youtube-outliers.exe
 
 # generated run outputs (CSV exports + one-off analysis writeups) - regenerate with the CLI
 *.csv

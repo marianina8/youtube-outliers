@@ -4,8 +4,9 @@ A small Go CLI for finding YouTube videos that have unusually high view counts r
 
 ## Prerequisites
 
-- Go 1.24 or newer (`go version` to check)
+- Go 1.24 or newer — [download and install Go](https://go.dev/dl/) (official installers for macOS, Windows, and Linux), then run `go version` to confirm
 - A free YouTube Data API key (see step 1 below)
+- *(Optional)* `make`, if you'd rather run `make build` / `make test` than the plain `go` commands below. Pre-installed on macOS and most Linux distributions; on Windows it's available via WSL, Git Bash, or MSYS2. Not required — every command in this README also has a plain `go`/OS-native equivalent.
 
 ## Get the code
 
@@ -31,20 +32,55 @@ In Google Cloud Console:
 3. Create an API key.
 4. Restrict the key to the YouTube Data API if desired.
 
-Then set it in your shell:
+Then set it as an environment variable. This differs by OS/shell:
 
+**macOS / Linux (bash or zsh):**
 ```bash
 export YOUTUBE_API_KEY='your-key-here'
 ```
+To make it persist across terminal sessions, add that line to `~/.zshrc` (default on modern macOS) or `~/.bashrc`/`~/.bash_profile` (most Linux distros), then run `source ~/.zshrc` (or open a new terminal).
 
-Do not commit your API key to Git.
+**Windows (PowerShell):**
+```powershell
+$env:YOUTUBE_API_KEY = "your-key-here"
+```
+This only lasts for the current PowerShell window. To make it persist across sessions:
+```powershell
+[System.Environment]::SetEnvironmentVariable("YOUTUBE_API_KEY", "your-key-here", "User")
+```
+then open a new PowerShell window.
+
+**Windows (Command Prompt):**
+```cmd
+set YOUTUBE_API_KEY=your-key-here
+```
+This only lasts for the current window. To make it persist:
+```cmd
+setx YOUTUBE_API_KEY "your-key-here"
+```
+then open a new Command Prompt window.
+
+Do not commit your API key to Git, on any OS.
 
 ## 2. Build
 
+If you have `make` (see Prerequisites):
 ```bash
-cd youtube-outliers
+make build
+```
+
+Otherwise, build directly with `go`:
+
+**macOS / Linux:**
+```bash
 go build -o youtube-outliers .
 ```
+
+**Windows (PowerShell or Command Prompt):**
+```powershell
+go build -o youtube-outliers.exe .
+```
+(Windows executables need the `.exe` extension; the examples further down assume you built it this way.)
 
 This project uses only the Go standard library.
 
@@ -53,6 +89,7 @@ This project uses only the Go standard library.
 ```bash
 go test ./...
 ```
+(or `make test`) — this one's identical on every OS.
 
 ## Quota awareness
 
@@ -122,15 +159,10 @@ A couple of practical tips:
 
 ## 3. Run a first search
 
+> **A note on the commands below:** they use `./youtube-outliers`, the macOS/Linux/WSL/Git-Bash way to run a program in the current directory. On native Windows (PowerShell or Command Prompt), use `.\youtube-outliers.exe` instead — everything else about the command is identical. Each example here is written on one line so it pastes cleanly into any shell.
+
 ```bash
-./youtube-outliers \
-  --keywords keywords.txt \
-  --results 25 \
-  --max-subs 20000 \
-  --min-views 10000 \
-  --min-ratio 3 \
-  --since 365d \
-  --output outliers.csv
+./youtube-outliers --keywords keywords.txt --results 25 --max-subs 20000 --min-views 10000 --min-ratio 3 --since 365d --output outliers.csv
 ```
 
 That means:
@@ -146,12 +178,7 @@ That means:
 For early research, do not filter too aggressively. Collect all the results and analyze them afterward:
 
 ```bash
-./youtube-outliers \
-  --keywords keywords.txt \
-  --results 50 \
-  --since 365d \
-  --all \
-  --output all_results.csv
+./youtube-outliers --keywords keywords.txt --results 50 --since 365d --all --output all_results.csv
 ```
 
 Then you can sort/filter the CSV yourself or give it to Claude/ChatGPT.
@@ -173,14 +200,7 @@ Look further back:
 Find very small-channel breakouts:
 
 ```bash
-./youtube-outliers \
-  --keywords keywords.txt \
-  --results 50 \
-  --max-subs 10000 \
-  --min-views 10000 \
-  --min-ratio 5 \
-  --since 365d \
-  --output small_channel_outliers.csv
+./youtube-outliers --keywords keywords.txt --results 50 --max-subs 10000 --min-views 10000 --min-ratio 5 --since 365d --output small_channel_outliers.csv
 ```
 
 ## CSV columns
