@@ -11,3 +11,6 @@ content-strategy-outliers.md
 
 # Cowork desktop app scratch folder, not part of the project
 Claude outputs/
+
+# local review reports (go-pr-provider / Ollama review)
+.go-pr-review/
