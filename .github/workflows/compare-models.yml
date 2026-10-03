@@ -1,0 +1,53 @@
+name: AI code review - compare models
+
+# Runs the same whole-codebase review against several Bedrock models in parallel:
+# same code, same instructions, one call per chunk; only the model changes.
+# Each model's report is its own artifact (code-review-<label>) and its own section
+# on the run's summary page.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "File or folder to review"
+        default: "."
+      qwen_model:
+        description: "Qwen3-Coder 480B"
+        default: "qwen.qwen3-coder-480b-a35b-v1:0"
+      deepseek_model:
+        description: "DeepSeek V3.2"
+        default: "deepseek.v3.2"
+      sonnet_model:
+        description: "Claude Sonnet 5.5"
+        default: "global.anthropic.claude-sonnet-5-5"
+      haiku_model:
+        description: "Claude Haiku 4.5"
+        default: "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write   # sign in to AWS without stored keys
+
+concurrency:
+  group: compare-models
+  cancel-in-progress: false
+
+jobs:
+  review:
+    name: ${{ matrix.label }}
+    strategy:
+      fail-fast: false   # one model failing shouldn't cancel the others
+      matrix:
+        include:
+          - { label: qwen3-coder-480b, model: "${{ inputs.qwen_model }}" }
+          - { label: deepseek-v3-2, model: "${{ inputs.deepseek_model }}" }
+          - { label: claude-sonnet-5-5, model: "${{ inputs.sonnet_model }}" }
+          - { label: claude-haiku-4-5, model: "${{ inputs.haiku_model }}" }
+    uses: marianina8/pr-review-agent/.github/workflows/code-review.yml@main
+    with:
+      mode: code
+      target: ${{ inputs.target }}
+      provider: bedrock
+      model: ${{ matrix.model }}
+      label: ${{ matrix.label }}
+      aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
