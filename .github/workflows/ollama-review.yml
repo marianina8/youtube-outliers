@@ -7,16 +7,22 @@ on:
   # "Run workflow" button on the Actions tab: review the whole codebase (or one folder).
   workflow_dispatch:
     inputs:
+      provider:
+        description: "Where the model runs"
+        type: choice
+        options: [ollama, bedrock]
+        default: ollama
+      model:
+        description: "Model (empty = qwen2.5-coder:7b for ollama, qwen.qwen3-coder-30b-a3b-v1:0 for bedrock)"
+        default: ""
       target:
         description: "File or folder to review"
         default: "."
-      model:
-        description: "Ollama model"
-        default: "qwen2.5-coder:7b"
 
 permissions:
   contents: read
   pull-requests: write
+  id-token: write   # lets provider=bedrock sign in to AWS without stored keys
 
 concurrency:
   group: ollama-review-${{ github.ref }}
@@ -28,4 +34,6 @@ jobs:
     with:
       mode: ${{ github.event_name == 'pull_request' && 'pr' || 'code' }}
       target: ${{ inputs.target || '.' }}
-      model: ${{ inputs.model || 'qwen2.5-coder:7b' }}
+      provider: ${{ inputs.provider || vars.REVIEW_PROVIDER || 'ollama' }}
+      model: ${{ inputs.model || '' }}
+      aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
