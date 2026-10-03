@@ -1,0 +1,39 @@
+name: AI code review
+
+on:
+  # Review what a pull request changes and comment on it.
+  pull_request:
+    paths: ["**.go", "go.mod", "go.sum"]
+  # "Run workflow" button on the Actions tab: review the whole codebase (or one folder).
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Where the model runs"
+        type: choice
+        options: [bedrock, ollama]
+        default: bedrock
+      model:
+        description: "Model (empty = qwen2.5-coder:7b for ollama, qwen.qwen3-coder-30b-a3b-v1:0 for bedrock)"
+        default: ""
+      target:
+        description: "File or folder to review"
+        default: "."
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write   # lets provider=bedrock sign in to AWS without stored keys
+
+concurrency:
+  group: code-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    uses: marianina8/pr-review-agent/.github/workflows/code-review.yml@main
+    with:
+      mode: ${{ github.event_name == 'pull_request' && 'pr' || 'code' }}
+      target: ${{ inputs.target || '.' }}
+      provider: ${{ inputs.provider || vars.REVIEW_PROVIDER || 'bedrock' }}
+      model: ${{ inputs.model || '' }}
+      aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
