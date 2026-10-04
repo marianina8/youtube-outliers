@@ -18,7 +18,7 @@ on:
         description: "agent style: max actions per model"
         default: "20"
       include_opus:
-        description: "Also run Claude Opus 5.5 (costs more, especially in agent style)"
+        description: "Also run Claude Opus 5.5 via the Anthropic API (costs more, especially in agent style)"
         type: boolean
         default: false
       target:
@@ -31,8 +31,8 @@ on:
         description: "DeepSeek V3.2"
         default: "deepseek.v3.2"
       sonnet_model:
-        description: "Claude Sonnet 5.5"
-        default: "global.anthropic.claude-sonnet-5-5"
+        description: "Claude Sonnet 5.5 (Anthropic API: Bedrock refuses Claude 5.x on this account)"
+        default: "claude-sonnet-5-5"
       haiku_model:
         description: "Claude Haiku 4.5"
         default: "us.anthropic.claude-haiku-4-5-20251001-v1:0"
@@ -53,20 +53,22 @@ jobs:
       fail-fast: false   # one model failing shouldn't cancel the others
       matrix:
         include:
-          - { label: qwen3-coder-480b, model: "${{ inputs.qwen_model }}" }
-          - { label: deepseek-v3-2, model: "${{ inputs.deepseek_model }}" }
-          - { label: claude-sonnet-5-5, model: "${{ inputs.sonnet_model }}" }
-          - { label: claude-haiku-4-5, model: "${{ inputs.haiku_model }}" }
+          - { label: qwen3-coder-480b, provider: bedrock, model: "${{ inputs.qwen_model }}" }
+          - { label: deepseek-v3-2, provider: bedrock, model: "${{ inputs.deepseek_model }}" }
+          - { label: claude-sonnet-5-5, provider: anthropic, model: "${{ inputs.sonnet_model }}" }
+          - { label: claude-haiku-4-5, provider: bedrock, model: "${{ inputs.haiku_model }}" }
     uses: marianina8/pr-review-agent/.github/workflows/code-review.yml@main
     with:
       mode: code
       target: ${{ inputs.target }}
-      provider: bedrock
+      provider: ${{ matrix.provider }}
       style: ${{ inputs.style }}
       max_steps: ${{ fromJSON(inputs.max_steps) }}
       model: ${{ matrix.model }}
       label: ${{ matrix.label }}-${{ inputs.style }}
       aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
   opus:
     name: claude-opus-5-5
@@ -75,9 +77,10 @@ jobs:
     with:
       mode: code
       target: ${{ inputs.target }}
-      provider: bedrock
+      provider: anthropic
       style: ${{ inputs.style }}
       max_steps: ${{ fromJSON(inputs.max_steps) }}
-      model: global.anthropic.claude-opus-5-5
+      model: claude-opus-5-5
       label: claude-opus-5-5-${{ inputs.style }}
-      aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
