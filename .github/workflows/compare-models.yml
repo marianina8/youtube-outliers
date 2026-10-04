@@ -1,40 +1,33 @@
 name: AI code review - compare models
 
-# Runs the same whole-codebase review against several Bedrock models in parallel:
-# same code, same instructions, same tools; only the model changes.
-#   style=single  one call per chunk (the model only reads)
-#   style=agent   the model may read files, write scratch tests and run go test/vet/run first
-# Each model's report is its own artifact (code-review-<label>) and its own section
-# on the run's summary page.
+# Runs the same Go review agent (marianina8/pr-review-agent) on the same code with several
+# models in parallel: same tools, same guidelines, same step limit; only the model changes.
+# Each model's review is its own artifact (code-review-<label>) and its own section on the
+# run's summary page, with steps, tool calls, tokens and time.
 on:
   workflow_dispatch:
     inputs:
-      style:
-        description: "single (read only) or agent (can run go commands)"
-        type: choice
-        options: [agent, single]
-        default: agent
       max_steps:
-        description: "agent style: max actions per model"
+        description: "Max model calls per model"
         default: "20"
       include_opus:
-        description: "Also run Claude Opus 5.5 via the Anthropic API (costs more, especially in agent style)"
+        description: "Also run Claude Opus 5.5 (costs more)"
         type: boolean
         default: false
       target:
         description: "File or folder to review"
         default: "."
       qwen_model:
-        description: "Qwen3-Coder 480B"
+        description: "Qwen3-Coder 480B (Bedrock)"
         default: "qwen.qwen3-coder-480b-a35b-v1:0"
       deepseek_model:
-        description: "DeepSeek V3.2"
+        description: "DeepSeek V3.2 (Bedrock)"
         default: "deepseek.v3.2"
       sonnet_model:
         description: "Claude Sonnet 5.5 (Anthropic API: Bedrock refuses Claude 5.x on this account)"
         default: "claude-sonnet-5-5"
       haiku_model:
-        description: "Claude Haiku 4.5"
+        description: "Claude Haiku 4.5 (Bedrock)"
         default: "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 
 permissions:
@@ -62,10 +55,9 @@ jobs:
       mode: code
       target: ${{ inputs.target }}
       provider: ${{ matrix.provider }}
-      style: ${{ inputs.style }}
-      max_steps: ${{ fromJSON(inputs.max_steps) }}
       model: ${{ matrix.model }}
-      label: ${{ matrix.label }}-${{ inputs.style }}
+      max_steps: ${{ fromJSON(inputs.max_steps) }}
+      label: ${{ matrix.label }}-go-agent
       aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -78,9 +70,8 @@ jobs:
       mode: code
       target: ${{ inputs.target }}
       provider: anthropic
-      style: ${{ inputs.style }}
-      max_steps: ${{ fromJSON(inputs.max_steps) }}
       model: claude-opus-5-5
-      label: claude-opus-5-5-${{ inputs.style }}
+      max_steps: ${{ fromJSON(inputs.max_steps) }}
+      label: claude-opus-5-5-go-agent
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

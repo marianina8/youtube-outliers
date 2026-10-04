@@ -1,5 +1,6 @@
 name: AI code review
 
+# Runs the Go review agent from marianina8/pr-review-agent on this repo.
 on:
   # Review what a pull request changes and comment on it.
   pull_request:
@@ -8,12 +9,12 @@ on:
   workflow_dispatch:
     inputs:
       provider:
-        description: "Where the model runs"
+        description: "Which model API the agent uses"
         type: choice
-        options: [bedrock, ollama]
-        default: bedrock
+        options: [anthropic, bedrock, ollama]
+        default: anthropic
       model:
-        description: "Model (empty = qwen2.5-coder:7b for ollama, qwen.qwen3-coder-30b-a3b-v1:0 for bedrock)"
+        description: "Model (empty = claude-sonnet-5-5 / qwen.qwen3-coder-480b-a35b-v1:0 / qwen2.5-coder:7b)"
         default: ""
       target:
         description: "File or folder to review"
@@ -34,6 +35,8 @@ jobs:
     with:
       mode: ${{ github.event_name == 'pull_request' && 'pr' || 'code' }}
       target: ${{ inputs.target || '.' }}
-      provider: ${{ inputs.provider || vars.REVIEW_PROVIDER || 'bedrock' }}
+      provider: ${{ inputs.provider || vars.REVIEW_PROVIDER || 'anthropic' }}
       model: ${{ inputs.model || '' }}
       aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
