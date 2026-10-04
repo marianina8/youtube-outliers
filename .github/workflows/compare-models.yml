@@ -1,12 +1,26 @@
 name: AI code review - compare models
 
 # Runs the same whole-codebase review against several Bedrock models in parallel:
-# same code, same instructions, one call per chunk; only the model changes.
+# same code, same instructions, same tools; only the model changes.
+#   style=single  one call per chunk (the model only reads)
+#   style=agent   the model may read files, write scratch tests and run go test/vet/run first
 # Each model's report is its own artifact (code-review-<label>) and its own section
 # on the run's summary page.
 on:
   workflow_dispatch:
     inputs:
+      style:
+        description: "single (read only) or agent (can run go commands)"
+        type: choice
+        options: [agent, single]
+        default: agent
+      max_steps:
+        description: "agent style: max actions per model"
+        default: "20"
+      include_opus:
+        description: "Also run Claude Opus 5.5 (costs more, especially in agent style)"
+        type: boolean
+        default: false
       target:
         description: "File or folder to review"
         default: "."
@@ -48,6 +62,22 @@ jobs:
       mode: code
       target: ${{ inputs.target }}
       provider: bedrock
+      style: ${{ inputs.style }}
+      max_steps: ${{ fromJSON(inputs.max_steps) }}
       model: ${{ matrix.model }}
-      label: ${{ matrix.label }}
+      label: ${{ matrix.label }}-${{ inputs.style }}
+      aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
+
+  opus:
+    name: claude-opus-5-5
+    if: ${{ inputs.include_opus }}
+    uses: marianina8/pr-review-agent/.github/workflows/code-review.yml@main
+    with:
+      mode: code
+      target: ${{ inputs.target }}
+      provider: bedrock
+      style: ${{ inputs.style }}
+      max_steps: ${{ fromJSON(inputs.max_steps) }}
+      model: global.anthropic.claude-opus-5-5
+      label: claude-opus-5-5-${{ inputs.style }}
       aws_role_arn: ${{ vars.BEDROCK_REVIEW_ROLE_ARN }}
