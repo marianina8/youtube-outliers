@@ -62,6 +62,9 @@ then open a new Command Prompt window.
 
 Do not commit your API key to Git, on any OS.
 
+The CLI sends the key in the `X-Goog-Api-Key` request header rather than the URL,
+so it never appears in error messages or logs (for example when a request times out).
+
 ## 2. Build
 
 If you have `make` (see Prerequisites):

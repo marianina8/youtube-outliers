@@ -351,7 +351,6 @@ func (c *youtubeClient) searchVideoIDs(ctx context.Context, keyword string, cfg 
 		q.Set("order", cfg.Order)
 		q.Set("regionCode", cfg.Region)
 		q.Set("relevanceLanguage", cfg.Language)
-		q.Set("key", c.apiKey)
 		if cfg.Since > 0 {
 			q.Set("publishedAfter", time.Now().UTC().Add(-cfg.Since).Format(time.RFC3339))
 		}
@@ -388,7 +387,6 @@ func (c *youtubeClient) fetchVideos(ctx context.Context, ids []string) (videosRe
 		q := url.Values{}
 		q.Set("part", "snippet,statistics")
 		q.Set("id", strings.Join(ids[start:end], ","))
-		q.Set("key", c.apiKey)
 
 		var resp videosResponse
 		if err := c.getJSON(ctx, youtubeAPIBase+"/videos?"+q.Encode(), &resp); err != nil {
@@ -409,7 +407,6 @@ func (c *youtubeClient) fetchChannels(ctx context.Context, ids []string) (channe
 		q := url.Values{}
 		q.Set("part", "statistics")
 		q.Set("id", strings.Join(ids[start:end], ","))
-		q.Set("key", c.apiKey)
 
 		var resp channelsResponse
 		if err := c.getJSON(ctx, youtubeAPIBase+"/channels?"+q.Encode(), &resp); err != nil {
@@ -423,11 +420,15 @@ func (c *youtubeClient) fetchChannels(ctx context.Context, ids []string) (channe
 func (c *youtubeClient) getJSON(ctx context.Context, endpoint string, dst any) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return err
+		return redactErr(err, c.apiKey)
 	}
+	// Send the key as a header, never as a ?key= query parameter: net/http
+	// embeds the full request URL in transport errors (timeouts, connection
+	// resets), so a key in the URL ends up in logs.
+	req.Header.Set("X-Goog-Api-Key", c.apiKey)
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return err
+		return redactErr(err, c.apiKey)
 	}
 	defer resp.Body.Close()
 
@@ -446,6 +447,19 @@ func (c *youtubeClient) getJSON(ctx context.Context, endpoint string, dst any) e
 	}
 
 	return json.NewDecoder(resp.Body).Decode(dst)
+}
+
+// redactErr scrubs the API key out of an error message as a last line of
+// defence, in case it ever reaches a URL or upstream error text.
+func redactErr(err error, apiKey string) error {
+	if err == nil || apiKey == "" {
+		return err
+	}
+	msg := err.Error()
+	if !strings.Contains(msg, apiKey) {
+		return err
+	}
+	return errors.New(strings.ReplaceAll(msg, apiKey, "REDACTED"))
 }
 
 func readKeywords(path string) ([]string, error) {

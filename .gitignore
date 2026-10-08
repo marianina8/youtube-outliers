@@ -14,3 +14,8 @@ Claude outputs/
 
 # local review reports (go-pr-provider / Ollama review)
 .go-pr-review/
+
+# daily runs (archive + rolling keyword state)
+runs/
+keywords.next.txt
+searched_keywords.txt
