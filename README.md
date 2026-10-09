@@ -227,12 +227,42 @@ Find very small-channel breakouts:
 
 YouTube may hide subscriber counts for some channels. Those videos remain available with `--all`, but cannot be scored using views/subscribers.
 
-## Claude / ChatGPT analysis prompt
+## Analyze the CSV with the Claude skill (or ChatGPT)
 
-For a thorough analysis, use the skill in [`skills/youtube-outlier-analyst/`](skills/youtube-outlier-analyst/):
+The repo includes an analysis skill in [`skills/youtube-outlier-analyst/`](skills/youtube-outlier-analyst/). It sanity-checks the data for keyword-collision noise and large-channel false positives, then ranks opportunities with cited evidence rather than an opaque score.
 
-- **Claude:** copy the `youtube-outlier-analyst` folder into your Claude Skills directory (or a project's `.claude/skills/`), then attach your CSV and ask Claude to use the `youtube-outlier-analyst` skill. It sanity-checks the data for keyword-collision noise and large-channel false positives before ranking, and writes each opportunity with cited evidence rather than an opaque score.
-- **ChatGPT:** paste [`skills/youtube-outlier-analyst/chatgpt-prompt.md`](skills/youtube-outlier-analyst/chatgpt-prompt.md)'s prompt block into a new chat (or a Custom GPT's instructions) before attaching your CSV.
+### What you need
+
+The skill only *analyzes* a CSV — it does not call YouTube itself. So:
+
+1. **This repo, built** — see "Get the code" and "2. Build" above. Requires Go.
+2. **A YouTube Data API key** — see step 1 above. The CLI needs it; the skill does not.
+3. **A CSV from a run** — follow "3. Run a first search" (or the exploratory run, which gives the skill the most to work with). The skill expects this CLI's columns.
+4. **Claude with custom skills enabled** — custom skills are available on Free, Pro, Max, Team, and Enterprise plans and require **Code execution and file creation** to be turned on (Settings → Capabilities; on Team/Enterprise an owner enables it). See [Use Skills in Claude](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
+
+No API key or repo? You can still try the skill on any CSV with similar columns (keyword, title, views, subscribers, published date), but you'll get the best results from this tool's output.
+
+### Install the skill
+
+**Claude (web or desktop app):**
+
+1. Zip the skill folder. The ZIP must contain the `youtube-outlier-analyst` folder (with `SKILL.md` inside it):
+   - macOS / Linux: `cd skills && zip -r youtube-outlier-analyst.zip youtube-outlier-analyst`
+   - Windows: in File Explorer, open `skills`, right-click `youtube-outlier-analyst` → **Compress to ZIP file**.
+2. In Claude, go to **Customize → Skills**, click **+** → **Create skill** → **Upload a skill**, and choose the ZIP.
+3. Make sure the skill is toggled on.
+
+**Claude Code:** copy the folder into `~/.claude/skills/` (all projects) or your project's `.claude/skills/`:
+
+```bash
+cp -r skills/youtube-outlier-analyst ~/.claude/skills/
+```
+
+### Use it
+
+Start a new chat, attach your CSV (for example `all_results.csv`), and ask something like: *"Use the youtube-outlier-analyst skill to find video ideas for my channel about [your niche]."*
+
+**ChatGPT:** there's no skill install; paste the prompt block from [`skills/youtube-outlier-analyst/chatgpt-prompt.md`](skills/youtube-outlier-analyst/chatgpt-prompt.md) into a new chat (or a Custom GPT's instructions), then attach your CSV.
 
 For a quick one-off instead, attach `all_results.csv` to Claude or ChatGPT and use something like:
 
@@ -243,3 +273,7 @@ For a quick one-off instead, attach `all_results.csv` to Claude or ChatGPT and u
 `search.list` is the discovery mechanism. The CLI then batches the resulting video IDs through `videos.list` for video statistics and the channel IDs through `channels.list` for subscriber statistics.
 
 The example `keywords.txt` mixes core niche terms with adjacent/bigger neighboring topics on purpose (see "Build Your Own Keyword List" above). The goal isn't to make videos about every topic in the list — it's to discover successful formats and hooks in nearby spaces and decide whether a version in your own niche would be compelling.
+
+## License
+
+[MIT](LICENSE)
