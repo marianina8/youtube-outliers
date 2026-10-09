@@ -240,8 +240,6 @@ The skill only *analyzes* a CSV — it does not call YouTube itself. So:
 3. **A CSV from a run** — follow "3. Run a first search" (or the exploratory run, which gives the skill the most to work with). The skill expects this CLI's columns.
 4. **Claude with custom skills enabled** — custom skills are available on Free, Pro, Max, Team, and Enterprise plans and require **Code execution and file creation** to be turned on (Settings → Capabilities; on Team/Enterprise an owner enables it). See [Use Skills in Claude](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
-No API key or repo? You can still try the skill on any CSV with similar columns (keyword, title, views, subscribers, published date), but you'll get the best results from this tool's output.
-
 ### Install the skill
 
 **Claude (web or desktop app):**
