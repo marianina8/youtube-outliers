@@ -178,3 +178,39 @@ func TestValidSearchOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestParseISODuration(t *testing.T) {
+	cases := map[string]int64{
+		"PT45S":      45,
+		"PT3M":       180,
+		"PT10M5S":    605,
+		"PT1H2M3S":   3723,
+		"PT11H0M12S": 39612,
+		"P1DT2H":     93600,
+		"P0D":        0,
+		"pt1m":       60,
+		"":           -1,
+		"PT":         0,
+		"1H2M":       -1,
+		"PTXS":       -1,
+		"PT5":        -1,
+		"P5H":        -1,
+	}
+	for in, want := range cases {
+		if got := parseISODuration(in); got != want {
+			t.Errorf("parseISODuration(%q) = %d, want %d", in, got, want)
+		}
+	}
+}
+
+func TestFormatDuration(t *testing.T) {
+	cases := map[int64]string{-1: "", 0: "0:00", 59: "0:59", 605: "10:05", 3723: "1:02:03", 39612: "11:00:12"}
+	for in, want := range cases {
+		if got := formatDuration(in); got != want {
+			t.Errorf("formatDuration(%d) = %q, want %q", in, got, want)
+		}
+		if in < 0 && durationSecondsField(in) != "" {
+			t.Errorf("durationSecondsField(%d) should be empty", in)
+		}
+	}
+}

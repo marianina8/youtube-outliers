@@ -60,6 +60,9 @@ type videosResponse struct {
 			Title        string `json:"title"`
 			ChannelTitle string `json:"channelTitle"`
 		} `json:"snippet"`
+		ContentDetails struct {
+			Duration string `json:"duration"`
+		} `json:"contentDetails"`
 		Statistics struct {
 			ViewCount    string `json:"viewCount"`
 			LikeCount    string `json:"likeCount"`
@@ -101,6 +104,7 @@ type videoStats struct {
 	PublishedAt       time.Time
 	AgeDays           float64
 	ViewsPerSub       float64
+	DurationSeconds   int64 // -1 when YouTube returned no parsable duration
 	ViewsPerDay       float64
 }
 
@@ -289,6 +293,7 @@ func (c *youtubeClient) collectKeyword(ctx context.Context, keyword string, cfg 
 			AgeDays:           ageDays,
 			ViewsPerSub:       ratio,
 			ViewsPerDay:       viewsPerDay,
+			DurationSeconds:   parseISODuration(v.ContentDetails.Duration),
 		}
 
 		if cfg.KeepAll || isOutlier(row, cfg) {
@@ -385,7 +390,7 @@ func (c *youtubeClient) fetchVideos(ctx context.Context, ids []string) (videosRe
 			end = len(ids)
 		}
 		q := url.Values{}
-		q.Set("part", "snippet,statistics")
+		q.Set("part", "snippet,statistics,contentDetails")
 		q.Set("id", strings.Join(ids[start:end], ","))
 
 		var resp videosResponse
@@ -502,6 +507,7 @@ func writeCSV(path string, rows []videoStats) error {
 		"keyword", "matched_keywords", "title", "video_id", "video_url", "channel_id", "channel",
 		"subscribers", "subscribers_hidden", "views", "likes", "comments",
 		"published_at", "age_days", "views_per_subscriber", "views_per_day",
+		"duration_seconds", "duration",
 	}
 	if err := w.Write(header); err != nil {
 		return err
@@ -529,6 +535,8 @@ func writeCSV(path string, rows []videoStats) error {
 			fmt.Sprintf("%.2f", r.AgeDays),
 			ratio,
 			fmt.Sprintf("%.2f", r.ViewsPerDay),
+			durationSecondsField(r.DurationSeconds),
+			formatDuration(r.DurationSeconds),
 		}
 		if err := w.Write(record); err != nil {
 			return err
@@ -563,6 +571,75 @@ func parseFriendlyDuration(s string) (time.Duration, error) {
 		return 0, errors.New("expected duration like 365d, 180d, 72h, or 0")
 	}
 	return d, nil
+}
+
+// parseISODuration converts a YouTube contentDetails.duration value such as
+// "PT1H2M3S" or "P1DT2H" into seconds. It returns -1 when the value is empty
+// or unparsable. Live streams that haven't ended report "P0D", which parses
+// as 0.
+func parseISODuration(s string) int64 {
+	s = strings.TrimSpace(strings.ToUpper(s))
+	if !strings.HasPrefix(s, "P") || len(s) < 2 {
+		return -1
+	}
+	var total, num int64
+	haveNum, inTime := false, false
+	for _, c := range s[1:] {
+		switch {
+		case c >= '0' && c <= '9':
+			num = num*10 + int64(c-'0')
+			haveNum = true
+		case c == 'T':
+			if haveNum || inTime {
+				return -1
+			}
+			inTime = true
+		default:
+			if !haveNum {
+				return -1
+			}
+			var unit int64
+			switch {
+			case c == 'W' && !inTime:
+				unit = 7 * 86400
+			case c == 'D' && !inTime:
+				unit = 86400
+			case c == 'H' && inTime:
+				unit = 3600
+			case c == 'M' && inTime:
+				unit = 60
+			case c == 'S' && inTime:
+				unit = 1
+			default:
+				return -1
+			}
+			total += num * unit
+			num, haveNum = 0, false
+		}
+	}
+	if haveNum {
+		return -1
+	}
+	return total
+}
+
+func durationSecondsField(sec int64) string {
+	if sec < 0 {
+		return ""
+	}
+	return strconv.FormatInt(sec, 10)
+}
+
+// formatDuration renders seconds as H:MM:SS (or M:SS under an hour).
+func formatDuration(sec int64) string {
+	if sec < 0 {
+		return ""
+	}
+	h, m, s := sec/3600, (sec%3600)/60, sec%60
+	if h > 0 {
+		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
+	}
+	return fmt.Sprintf("%d:%02d", m, s)
 }
 
 // appendUnique appends v to s if it isn't already present.

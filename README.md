@@ -224,6 +224,8 @@ Find very small-channel breakouts:
 - `age_days`
 - `views_per_subscriber`
 - `views_per_day`
+- `duration_seconds` (video length in seconds; empty if YouTube didn't return one, `0` for a live stream that hasn't ended)
+- `duration` (the same length as `H:MM:SS`, or `M:SS` under an hour)
 
 YouTube may hide subscriber counts for some channels. Those videos remain available with `--all`, but cannot be scored using views/subscribers.
 
@@ -268,7 +270,7 @@ For a quick one-off instead, attach `all_results.csv` to Claude or ChatGPT and u
 
 ## A note about YouTube search
 
-`search.list` is the discovery mechanism. The CLI then batches the resulting video IDs through `videos.list` for video statistics and the channel IDs through `channels.list` for subscriber statistics.
+`search.list` is the discovery mechanism. The CLI then batches the resulting video IDs through `videos.list` for video statistics and length (`contentDetails`, which adds no quota cost) and the channel IDs through `channels.list` for subscriber statistics.
 
 The example `keywords.txt` mixes core niche terms with adjacent/bigger neighboring topics on purpose (see "Build Your Own Keyword List" above). The goal isn't to make videos about every topic in the list — it's to discover successful formats and hooks in nearby spaces and decide whether a version in your own niche would be compelling.
 
